@@ -17,6 +17,9 @@
 #define PCI_CMD_MEM        0x2
 #define PCI_CMD_MASTER     0x4
 
+extern int ncpu;
+int e1000_irq = -1;
+
 extern void e1000_init(uint, uchar);
 
 struct pci_func {
@@ -112,13 +115,17 @@ check_all_buses(void)
                 f.bar0 = pci_config_read_dword(bus, device, 0, PCI_BAR0);
                 f.bar0 &= ~0xF;
                 f.irqline = pci_config_read_byte(bus, device, 0, PCI_INTERRUPT_LINE);
+                e1000_irq = f.irqline;
 
                 ushort cmd = pci_config_read_word(bus, device, 0, PCI_COMMAND);
                 cmd |= PCI_CMD_MEM | PCI_CMD_MASTER;
                 pci_config_write_word(bus, device, 0, PCI_COMMAND, cmd);
 
+                if (e1000_irq < 32)
+                    ioapicenable(e1000_irq, ncpu - 1);
+
                 e1000_init(f.bar0, f.irqline);
-                break;
+                return;
             }
         }
     }

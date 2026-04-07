@@ -42,6 +42,18 @@
 #define RX_RING_SIZE 16
 #define E1000_PKT_BUF_SZ 2048
 
+#define E1000_ICR_TXDW   0x00000001
+#define E1000_ICR_LSC    0x00000004
+#define E1000_ICR_RXDMT0 0x00000010
+#define E1000_ICR_RXO    0x00000040
+#define E1000_ICR_RXT0   0x00000080
+
+#define E1000_IMS_TXDW   0x00000001
+#define E1000_IMS_LSC    0x00000004
+#define E1000_IMS_RXDMT0 0x00000010
+#define E1000_IMS_RXO    0x00000040
+#define E1000_IMS_RXT0   0x00000080
+
 struct tx_desc {
     unsigned long long addr;
     ushort length;

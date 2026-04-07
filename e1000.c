@@ -97,7 +97,10 @@ e1000_init(uint bar0, uchar irqline)
     e1000_init_tx();
     e1000_init_rx();
 
-    e1000_reg_write(E1000_IMS, 0);
+    e1000_reg_read(E1000_ICR);
+    e1000_reg_write(E1000_IMS, 
+        E1000_ICR_RXT0 | E1000_ICR_RXDMT0 | E1000_ICR_RXO | 
+        E1000_ICR_TXDW | E1000_ICR_LSC);
     cprintf("e1000_init: tx/rx rings ready\n");
 }
 
@@ -132,10 +135,8 @@ e1000_transmit(void* buf, uint len)
 }
 
 void
-e1000_recv(void)
+e1000_recv_locked(void)
 {
-    acquire(&e1000_lock);
-
     for (;;) {
         uint r = (e1000_reg_read(E1000_RDT) + 1) % RX_RING_SIZE;
 
@@ -163,6 +164,23 @@ e1000_recv(void)
         kfree(buf);
         e1000_reg_write(E1000_RDT, r);
     }
+}
 
+void 
+e1000_recv(void)
+{
+    acquire(&e1000_lock);
+    e1000_recv_locked();
+    release(&e1000_lock);
+}
+
+void
+e1000_intr(void)
+{
+    acquire(&e1000_lock);
+    uint icr = e1000_reg_read(E1000_ICR);
+    if (icr & (E1000_ICR_RXT0 | E1000_ICR_RXDMT0 | E1000_ICR_RXO)) {
+        e1000_recv_locked();
+    }
     release(&e1000_lock);
 }

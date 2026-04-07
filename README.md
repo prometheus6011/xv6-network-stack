@@ -26,6 +26,8 @@ defs.c
 ```c
 // pci.c
 void            pciinit(void);
+extern int      e1000_irq;
+void            e1000_intr(void);
 
 // e1000.c
 void            e1000_init(uint, uchar);
@@ -47,6 +49,16 @@ static inline void
 outl(ushort port, uint data)
 {
   asm volatile("outl %0, %1" : : "a"(data), "d"(port));
+}
+```
+
+trap.c
+```c
+// after default case in void trap();
+if (0 <= e1000_irq && e1000_irq < 32 && tf->trapno == T_IRQ0 + e1000_irq) {
+  e1000_intr();
+  lapiceoi();
+  break;
 }
 ```
 
