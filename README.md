@@ -2,7 +2,6 @@
 
 the following changes have to be made to the following files in order for this program to work
 this repository is forked from the https://github.com/mit-pdos/xv6-public
-
 my build process on Macbook M-series chips using qemu
 ```
 make clean TOOLPREFIX=i686-elf-
@@ -13,6 +12,7 @@ make qemu TOOLPREFIX=i686-elf-
 Makefile
 ```
 pci.o\   \\ line 30
+e1000.o\  \\ line 31
 CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -fno-omit-frame-pointer  \\ line 80
 QEMUEXTRA += -nic user,model=e1000   \\ line 224
 ```
@@ -26,6 +26,11 @@ defs.c
 ```c
 // pci.c
 void            pciinit(void);
+
+// e1000.c
+void            e1000_init(uint, uchar);
+int             e1000_transmit(void*, uint);
+void            e1000_recv(void);
 ```
 
 x86.h
