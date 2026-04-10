@@ -11,8 +11,11 @@ make qemu TOOLPREFIX=i686-elf-
 
 Makefile
 ```
-pci.o\   \\ line 30
-e1000.o\  \\ line 31
+pci.o\
+e1000.o\
+net.o\
+arp.o\
+
 CFLAGS = -fno-pic -static -fno-builtin -fno-strict-aliasing -O2 -Wall -MD -ggdb -m32 -fno-omit-frame-pointer  \\ line 80
 QEMUEXTRA += -nic user,model=e1000   \\ line 224
 ```
@@ -20,6 +23,7 @@ QEMUEXTRA += -nic user,model=e1000   \\ line 224
 main.c
 ```c
 pciinit();       // pci line 34
+netinit();       // net
 ```
 
 defs.c
@@ -33,6 +37,12 @@ void            e1000_intr(void);
 void            e1000_init(uint, uchar);
 int             e1000_transmit(void*, uint);
 void            e1000_recv(void);
+
+// net.c
+void            netinit(void);
+
+// arp.c
+void            arpinit(void);
 ```
 
 x86.h

@@ -5,6 +5,7 @@
 #include "mmu.h"
 #include "x86.h"
 #include "e1000_dev.h"
+#include "net.h"
 
 static volatile uint *regs;
 static struct spinlock e1000_lock;
@@ -137,6 +138,9 @@ e1000_transmit(void* buf, uint len)
 void
 e1000_recv_locked(void)
 {
+    char *buf;
+    uint len;
+
     for (;;) {
         uint r = (e1000_reg_read(E1000_RDT) + 1) % RX_RING_SIZE;
 
@@ -144,10 +148,8 @@ e1000_recv_locked(void)
             break;
         }
 
-        char *buf = rx_bufs[r];
-        uint len = rx_ring[r].length;
-
-        cprintf("e1000_recv: packet len=%d idx=%d\n", len, r);
+        buf = rx_bufs[r];
+        len = rx_ring[r].length;
 
         rx_bufs[r] = kalloc();
         if (rx_bufs[r] == 0) {
@@ -161,8 +163,14 @@ e1000_recv_locked(void)
         rx_ring[r].errors = 0;
         rx_ring[r].special = 0;
 
-        kfree(buf);
         e1000_reg_write(E1000_RDT, r);
+
+        // Process the packet outside the NIC lock so receive handlers
+        // can safely trigger transmit-side work.
+        release(&e1000_lock);
+        netrx(buf, len);
+        kfree(buf);
+        acquire(&e1000_lock);
     }
 }
 

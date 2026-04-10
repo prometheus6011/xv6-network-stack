@@ -25,9 +25,9 @@ struct net_stats {
 };
 
 void netinit(void);
-void netrx(void* buf, uint len);
-void nettx(void* buf, uint len);
+void netrx(void*, uint);
+void nettx(void*, uint);
 
-const struct net_stats *netstats(coid);
+const struct net_stats *netstats(void);
 
 #endif  // XV6_NET_H
