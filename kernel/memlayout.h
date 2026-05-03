@@ -25,6 +25,10 @@
 #define VIRTIO0 0x10001000
 #define VIRTIO0_IRQ 1
 
+// PCIe ECAM configuration space on qemu -machine virt.
+#define PCI_ECAM 0x30000000L
+#define PCI_ECAM_SIZE 0x10000000L
+
 // qemu puts platform-level interrupt controller (PLIC) here.
 #define PLIC 0x0c000000L
 #define PLIC_PRIORITY (PLIC + 0x0)
