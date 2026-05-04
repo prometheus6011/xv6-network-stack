@@ -6,13 +6,23 @@
 #include "defs.h"
 #include "memlayout.h"
 
+#define INTEL_VENDOR_ID 0x8086
+#define INTEL_E1000_NIC_ID 0x100E
+
 struct pci_device_id {
-    uint32 vendor, device;
-    uint32 subvendor, subdevice;
-    uint32 class, class_mask;
-    uint64 driver_data;
-    uint32 override_only;
+    uint16 bus;
+    uint8 device;
+    uint8 function;
+    uint16 vendor_id;
+    uint16 device_id;
+    // uint8 class_code;
+    // uint8 subclass;
+    // uint8 prog_if;
+    uint32 bar[6];
 };
+
+struct pci_device_id pci_devs[32];
+extern uint8 pci_devs_ptr;
 
 void pciinit();
 

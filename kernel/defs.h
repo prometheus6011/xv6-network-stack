@@ -183,6 +183,10 @@ void            virtio_disk_intr(void);
 
 // pci.c
 void            pciinit();
+struct          pci_device_id;
+
+// e1000.c
+void            e1000_init(struct pci_device_id*);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
